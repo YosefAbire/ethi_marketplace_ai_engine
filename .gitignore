@@ -1,0 +1,14 @@
+.env
+list_models.py
+__pycache__/
+*.pyc
+*.sqlite3
+.env.*
+env
+env/
+venv/
+venv*/
+*.pyo
+*.log
+.vscode/
+.idea/
