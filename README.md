@@ -1,7 +1,7 @@
 README.md
 # 🛒 Marketplace AI
 
-**Marketplace AI** is a Direct-to-Consumer (D2C) agricultural retail management system that combines **PostgreSQL-based database management** with **AI-powered natural language querying**.  
+**Marketplace AI** is  agricultural retail management system that combines **PostgreSQL-based database management** with **AI-powered natural language querying**.  
 
 The system allows users to manage sellers, products, and orders, while enabling intelligent queries over the database using Google’s Generative AI models.  
 
@@ -169,3 +169,4 @@ ENV/
 
 # MacOS
 .DS_Store
+
