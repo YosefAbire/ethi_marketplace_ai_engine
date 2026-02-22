@@ -23,3 +23,42 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+*.egg-info/
+
+# Database files
+*.db
+*.sqlite3
+marketplace.db
+
+# ChromaDB vector store
+backend/chroma_db/
+chroma_db/
+
+# Embedding cache
+backend/embedding_cache/
+embedding_cache/
+test_cache/
+
+# Environment variables
+.env
+backend/.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
