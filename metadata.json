@@ -1,0 +1,8 @@
+{
+  "name": "Ethi Marketplace AI Engine",
+  "description": "Enterprise-grade multi-agent marketplace platform featuring SQL, RAG, and Workflow agents.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

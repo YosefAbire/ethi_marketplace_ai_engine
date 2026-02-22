@@ -1,0 +1,6 @@
+--- Debugging Vector Store ---
+Querying for Mall_Customers.csv chunks...
+Checking for source: C:\Users\hp\OneDrive\Desktop\ethi-marketplace-ai-engine\backend\data\Mall_Customers.csv
+
+Exact match failed. Fetching sample to verify paths stored...
+Sample sources in DB:

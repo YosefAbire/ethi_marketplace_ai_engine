@@ -1,0 +1,17 @@
+
+fastapi
+uvicorn
+langchain
+google-generativeai
+chromadb
+sqlalchemy
+pydantic
+python-multipart
+langchain-google-genai
+python-dotenv
+passlib[bcrypt]
+docx2txt
+psycopg2-binary
+sentence-transformers
+torch
+numpy
