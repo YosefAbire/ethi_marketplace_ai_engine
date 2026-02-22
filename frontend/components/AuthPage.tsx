@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { apiService } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 interface AuthPageProps {
     onLogin: (user: any) => void;
@@ -7,6 +7,7 @@ interface AuthPageProps {
 }
 
 export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onBack }) => {
+    const { login, signup } = useAuth();
     const [isLogin, setIsLogin] = useState(true);
     const [formData, setFormData] = useState({ email: '', password: '', name: '' });
     const [loading, setLoading] = useState(false);
@@ -21,9 +22,19 @@ export const AuthPage: React.FC<AuthPageProps> = ({ onLogin, onBack }) => {
         try {
             let userData;
             if (isLogin) {
-                userData = await apiService.login(formData.email, formData.password);
+                const userCredential: any = await login(formData.email, formData.password);
+                userData = {
+                    name: userCredential.user.displayName || userCredential.user.email,
+                    email: userCredential.user.email,
+                    uid: userCredential.user.uid
+                };
             } else {
-                userData = await apiService.register(formData.name, formData.email, formData.password);
+                const userCredential: any = await signup(formData.name, formData.email, formData.password);
+                userData = {
+                    name: formData.name,
+                    email: userCredential.user.email,
+                    uid: userCredential.user.uid
+                };
             }
 
             localStorage.setItem('ethi_market_user', JSON.stringify(userData));

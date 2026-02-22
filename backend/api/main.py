@@ -31,6 +31,7 @@ from agents.recommendation_agent import RecommendationAgent
 from agents.fraud_detection_agent import FraudDetectionAgent
 from services.fraud_detection_service import FraudDetectionService
 from services.email_service import EmailService
+from .firebase_auth import get_current_user
 
 app = FastAPI(title="Ethi Marketplace AI Engine")
 
@@ -262,9 +263,14 @@ async def login(user: UserLogin):
         "token": f"auth-token-{db_user.id}"
     }
 
-# --- Dashboard Endpoints ---
+@app.get("/auth/me")
+async def get_me(current_user: dict = Depends(get_current_user)):
+    """Return the currently authenticated Firebase user."""
+    return current_user
+
+# --- Dashboard Endpoints (Protected) ---
 @app.get("/dashboard/stats")
-async def get_dashboard_stats():
+async def get_dashboard_stats(current_user: dict = Depends(get_current_user)):
     db = SessionLocal()
     products = db.query(DBProduct).all()
     orders = db.query(DBOrder).all()
@@ -283,21 +289,21 @@ async def get_dashboard_stats():
     }
 
 @app.get("/dashboard/products")
-async def get_all_products():
+async def get_all_products(current_user: dict = Depends(get_current_user)):
     db = SessionLocal()
     products = db.query(DBProduct).all()
     db.close()
     return products
 
 @app.get("/dashboard/orders")
-async def get_all_orders():
+async def get_all_orders(current_user: dict = Depends(get_current_user)):
     db = SessionLocal()
     orders = db.query(DBOrder).all()
     db.close()
     return orders
 
 @app.get("/dashboard/analytics")
-async def get_analytics():
+async def get_analytics(current_user: dict = Depends(get_current_user)):
     """Analytics endpoint for dashboard charts and insights."""
     try:
         db = SessionLocal()
@@ -385,7 +391,7 @@ async def get_analytics():
         }
 
 @app.get("/dashboard/search")
-async def search_dashboard(q: str = ""):
+async def search_dashboard(q: str = "", current_user: dict = Depends(get_current_user)):
     """Enhanced search endpoint for dashboard data."""
     if not q.strip():
         return {"results": [], "total": 0, "query": q}
@@ -482,7 +488,7 @@ async def search_dashboard(q: str = ""):
         return {"results": [], "total": 0, "query": q, "error": str(e)}
 
 @app.post("/ask")
-async def sql_query(query: Query):
+async def sql_query(query: Query, current_user: dict = Depends(get_current_user)):
     """Structured data endpoint (Inventory/Orders)."""
     try:
         generated_sql = sql_agent.query_inventory(query.prompt)
@@ -522,7 +528,7 @@ async def sql_query(query: Query):
             }
 
 @app.post("/rag/ask")
-async def rag_query(query: Query):
+async def rag_query(query: Query, current_user: dict = Depends(get_current_user)):
     """Unstructured data endpoint (Documents/PDFs)."""
     if not rag_agent:
         return {
@@ -548,7 +554,7 @@ async def rag_query(query: Query):
 # Removed duplicate import and comments
 
 @app.post("/rag/upload")
-async def upload_document(background_tasks: BackgroundTasks, file: UploadFile = File(...)):
+async def upload_document(background_tasks: BackgroundTasks, file: UploadFile = File(...), current_user: dict = Depends(get_current_user)):
     """Uploads a file and automatically triggers background indexing."""
     file_path = os.path.join(DATA_DIR, file.filename)
     try:
@@ -565,7 +571,7 @@ async def upload_document(background_tasks: BackgroundTasks, file: UploadFile = 
         raise HTTPException(status_code=500, detail=f"Upload failed: {str(e)}")
 
 @app.get("/rag/documents")
-async def list_documents():
+async def list_documents(current_user: dict = Depends(get_current_user)):
     """Lists all uploaded documents."""
     files = []
     for filename in os.listdir(DATA_DIR):
@@ -609,7 +615,7 @@ async def delete_document(filename: str):
         raise HTTPException(status_code=500, detail=f"Delete failed: {str(e)}")
 
 @app.post("/seller/ask")
-async def seller_advice(query: Query):
+async def seller_advice(query: Query, current_user: dict = Depends(get_current_user)):
     """Strategic advice endpoint for sellers."""
     if not seller_agent:
         return {
@@ -644,7 +650,7 @@ async def seller_advice(query: Query):
         }
 
 @app.post("/ops/ask")
-async def ops_management(query: Query):
+async def ops_management(query: Query, current_user: dict = Depends(get_current_user)):
     """Logistics and operations management endpoint."""
     if not ops_agent:
         return {
@@ -677,7 +683,7 @@ async def ops_management(query: Query):
         }
 
 @app.post("/recommendation/ask")
-async def recommendation_query(query: Query):
+async def recommendation_query(query: Query, current_user: dict = Depends(get_current_user)):
     """Recommendation engine endpoint for pricing, inventory, and demand insights."""
     if not recommendation_agent:
         return {
@@ -727,7 +733,7 @@ async def recommendation_query(query: Query):
             }
 
 @app.post("/workflow/ask")
-async def unified_query(query: Query):
+async def unified_query(query: Query, current_user: dict = Depends(get_current_user)):
     """Intelligent routing endpoint using WorkflowAgent."""
     if not workflow_agent:
         return {
@@ -778,7 +784,7 @@ class ContactFormData(BaseModel):
     projectType: str
 
 @app.post("/fraud/scan")
-async def run_fraud_scan(request: FraudScanRequest):
+async def run_fraud_scan(request: FraudScanRequest, current_user: dict = Depends(get_current_user)):
     """Run fraud detection scan on marketplace data."""
     if not fraud_detection_service:
         return {

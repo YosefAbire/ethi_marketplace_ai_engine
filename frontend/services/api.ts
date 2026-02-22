@@ -11,34 +11,13 @@ export interface BackendResponse {
     notifications?: Notification[];
 }
 
+const getAuthHeader = () => {
+    const token = localStorage.getItem('ethi_market_token');
+    return token ? { "Authorization": `Bearer ${token}` } : {};
+};
+
 export const apiService = {
-    async login(email: string, password: string): Promise<any> {
-        const response = await fetch(`${API_BASE_URL}/login`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email, password }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.detail || "Login failed");
-        }
-        return await response.json();
-    },
-
-    async register(name: string, email: string, password: string): Promise<any> {
-        const response = await fetch(`${API_BASE_URL}/register`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ name, email, password }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.detail || "Registration failed");
-        }
-        return await response.json();
-    },
+    // ... items omitted ...
 
     async ask(prompt: string, role: AgentRole): Promise<BackendResponse> {
         const endpoint = this.getEndpoint(role);
@@ -47,6 +26,7 @@ export const apiService = {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
+                ...getAuthHeader()
             },
             body: JSON.stringify({ prompt }),
         });
@@ -67,7 +47,9 @@ export const apiService = {
     },
 
     async getDocuments(): Promise<any[]> {
-        const response = await fetch(`${API_BASE_URL}/rag/documents?t=${new Date().getTime()}`);
+        const response = await fetch(`${API_BASE_URL}/rag/documents?t=${new Date().getTime()}`, {
+            headers: { ...getAuthHeader() }
+        });
         if (!response.ok) throw new Error("Failed to fetch documents");
         return await response.json();
     },
@@ -78,6 +60,7 @@ export const apiService = {
 
         const response = await fetch(`${API_BASE_URL}/rag/upload`, {
             method: "POST",
+            headers: { ...getAuthHeader() },
             body: formData,
         });
 
@@ -89,31 +72,41 @@ export const apiService = {
     },
 
     async getDashboardStats(): Promise<any> {
-        const response = await fetch(`${API_BASE_URL}/dashboard/stats`);
+        const response = await fetch(`${API_BASE_URL}/dashboard/stats`, {
+            headers: { ...getAuthHeader() }
+        });
         if (!response.ok) throw new Error("Failed to fetch dashboard stats");
         return await response.json();
     },
 
     async getAnalytics() {
-        const response = await fetch(`${API_BASE_URL}/dashboard/analytics`);
+        const response = await fetch(`${API_BASE_URL}/dashboard/analytics`, {
+            headers: { ...getAuthHeader() }
+        });
         if (!response.ok) throw new Error("Failed to fetch analytics");
         return await response.json();
     },
 
     async searchDashboard(query: string): Promise<any> {
-        const response = await fetch(`${API_BASE_URL}/dashboard/search?q=${encodeURIComponent(query)}`);
+        const response = await fetch(`${API_BASE_URL}/dashboard/search?q=${encodeURIComponent(query)}`, {
+            headers: { ...getAuthHeader() }
+        });
         if (!response.ok) throw new Error("Failed to search dashboard");
         return await response.json();
     },
 
     async getProducts(): Promise<Product[]> {
-        const response = await fetch(`${API_BASE_URL}/dashboard/products`);
+        const response = await fetch(`${API_BASE_URL}/dashboard/products`, {
+            headers: { ...getAuthHeader() }
+        });
         if (!response.ok) throw new Error("Failed to fetch products");
         return await response.json();
     },
 
     async getOrders(): Promise<Order[]> {
-        const response = await fetch(`${API_BASE_URL}/dashboard/orders`);
+        const response = await fetch(`${API_BASE_URL}/dashboard/orders`, {
+            headers: { ...getAuthHeader() }
+        });
         if (!response.ok) throw new Error("Failed to fetch orders");
         return await response.json();
     },
@@ -121,6 +114,7 @@ export const apiService = {
     async deleteDocument(filename: string): Promise<any> {
         const response = await fetch(`${API_BASE_URL}/rag/documents/${encodeURIComponent(filename)}`, {
             method: "DELETE",
+            headers: { ...getAuthHeader() }
         });
 
         if (!response.ok) {

@@ -16,6 +16,7 @@ import { LandingPage } from './components/LandingPage';
 import { InteractiveLandingPage } from './components/InteractiveLandingPage';
 import { AuthPage } from './components/AuthPage';
 import { RevenuePage, ActiveOrdersPage, InventoryPage, AlertsPage } from './components/MetricPages';
+import { useAuth } from './context/AuthContext';
 
 const App: React.FC = () => {
   const [view, setView] = useState<'landing' | 'auth' | 'app'>('landing');
@@ -90,9 +91,10 @@ const App: React.FC = () => {
     }
   };
 
+  const { currentUser: authUser, logout: authLogout } = useAuth();
+
   useEffect(() => {
     const savedEmail = localStorage.getItem('ethi_market_email_config');
-    const savedUser = localStorage.getItem('ethi_market_user');
     fetchDocuments();
     fetchDashboardData();
 
@@ -101,14 +103,21 @@ const App: React.FC = () => {
         setEmailConfig(JSON.parse(savedEmail));
       } catch (e) { }
     }
-
-    if (savedUser) {
-      try {
-        setUser(JSON.parse(savedUser));
-        setView('app');
-      } catch (e) { }
-    }
   }, []);
+
+  useEffect(() => {
+    if (authUser) {
+      setUser({
+        name: authUser.displayName || authUser.email,
+        email: authUser.email,
+        uid: authUser.uid
+      });
+      setView('app');
+    } else {
+      setUser(null);
+      if (view === 'app') setView('landing');
+    }
+  }, [authUser]);
 
   useEffect(() => {
     localStorage.setItem('ethi_market_email_config', JSON.stringify(emailConfig));
@@ -210,8 +219,8 @@ const App: React.FC = () => {
           setActiveTab={(tab) => { setActiveTab(tab); setIsSidebarOpen(false); }}
           emailConfig={emailConfig}
           setEmailConfig={setEmailConfig}
-          onLogout={() => {
-            localStorage.removeItem('ethi_market_user');
+          onLogout={async () => {
+            await authLogout();
             setUser(null);
             setView('landing');
           }}
