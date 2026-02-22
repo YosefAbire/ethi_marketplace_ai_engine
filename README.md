@@ -1,6 +1,4 @@
 <div align="center">
-  <img width="1200" height="400" alt="Ethi Marketplace Banner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" style="border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.15);" />
-
   # 🇪🇹 Ethi Marketplace AI Engine
   ### *The Future of Ethiopian E-commerce Intelligence*
 
